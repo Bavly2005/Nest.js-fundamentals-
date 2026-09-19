@@ -8,51 +8,49 @@ import {
   Post,
   Patch,
   Delete,
-  Req,
+  ParseUUIDPipe,
+  ValidationPipe,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserEntity } from './user.entity';
-import { v4 as uuid } from 'uuid';
+import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
+  constructor(private readonly userService: UserService) {}
   private users: UserEntity[] = [];
 
   @Get()
   find(): UserEntity[] {
-    return this.users;
+    return this.userService.findUsers();
   }
 
   @Get(':id')
-  findone(@Param('id') id: string): UserEntity {
-    return this.users.find((user) => user.id === id);
+  findone(@Param('id', ParseUUIDPipe) id: string): UserEntity {
+    return this.userService.findUser(id);
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    const newUser: UserEntity = {
-      ...createUserDto,
-      id: uuid(),
-    };
-    this.users.push(newUser);
-    return newUser;
+  create(
+    @Body(new ValidationPipe({ groups: ['create'] }))
+    createUserDto: CreateUserDto,
+  ) {
+    return this.userService.createUser(createUserDto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    // 1) find the element index that we want to update
-    const index = this.users.findIndex((user) => user.id === id);
-    // 2) update the element
-    this.users[index] = { ...this.users[index], ...updateUserDto };
-
-    return this.users[index];
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(new ValidationPipe({ groups: ['update'] }))
+    updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
-    this.users = this.users.filter((user) => user.id !== id);
+    return this.userService.deleteUser(id);
   }
 }
