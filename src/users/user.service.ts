@@ -1,16 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 import { UserEntity } from './user.entity';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { APP_NAME, USER_HAPITS } from './user.constants';
 
 @Injectable()
 export class UserService {
+  constructor(
+    @Inject(APP_NAME) private appName: string,
+    @Inject(USER_HAPITS) private userHapits: string[],
+  ) {}
+
   private users: UserEntity[] = [];
 
   findUsers(): UserEntity[] {
     return this.users;
   }
- 
+
   findUser(id: string): UserEntity {
     return this.users.find((user) => user.id === id);
   }
