@@ -1,9 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
+
 import { UserEntity } from './user.entity';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { APP_NAME, USER_HAPITS } from './user.constants';
+import { UserResponseDto } from './dtos/user-response.dto';
 
 @Injectable()
 export class UserService {
@@ -22,7 +24,7 @@ export class UserService {
     return this.users.find((user) => user.id === id);
   }
 
-  createUser(createUserDto: CreateUserDto): UserEntity {
+  createUser(createUserDto: CreateUserDto): UserResponseDto {
     const newUser: UserEntity = {
       ...createUserDto,
       id: uuid(),
