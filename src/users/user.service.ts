@@ -20,8 +20,9 @@ export class UserService {
     return this.users;
   }
 
-  findUser(id: string): UserEntity {
-    return this.users.find((user) => user.id === id);
+  findUser(id: string): UserResponseDto {
+    const user = this.users.find((user) => user.id === id);
+    return new UserResponseDto(user);
   }
 
   createUser(createUserDto: CreateUserDto): UserResponseDto {
@@ -30,7 +31,7 @@ export class UserService {
       id: uuid(),
     };
     this.users.push(newUser);
-    return newUser;
+    return new UserResponseDto(newUser);
   }
 
   updateUser(id: string, updateUserDto: UpdateUserDto): UserEntity {

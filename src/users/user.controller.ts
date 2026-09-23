@@ -15,6 +15,7 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
+import { UserResponseDto } from './dtos/user-response.dto';
 
 @Controller('users')
 export class UserController {
@@ -22,19 +23,21 @@ export class UserController {
   private users: UserEntity[] = [];
 
   @Get()
-  find(): UserEntity[] {
+  async find(): Promise<UserEntity[]> {
+    // delay 5 sec
+    await new Promise((resolve) => setTimeout(resolve, 500));
     return this.userService.findUsers();
   }
 
   @Get(':id')
-  findone(@Param('id', ParseUUIDPipe) id: string): UserEntity {
+  findone(@Param('id', ParseUUIDPipe) id: string): UserResponseDto {
     return this.userService.findUser(id);
   }
 
   @Post()
   create(
     @Body(new ValidationPipe({ groups: ['create'] }))
-    createUserDto: CreateUserDto,
+    createUserDto: UserResponseDto,
   ) {
     return this.userService.createUser(createUserDto);
   }
