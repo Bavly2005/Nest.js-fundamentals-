@@ -41,6 +41,10 @@ class DatabaseConnection {
     LoggerService,
     LoggerServiceAliasProvider,
     DatabaseConnection,
+    {
+      provide: 'LoggerServiceAlias',
+      useExisting: LoggerService,
+    },
     // Custom provider
     // value based provider
     {
