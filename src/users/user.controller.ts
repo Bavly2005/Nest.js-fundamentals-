@@ -11,17 +11,20 @@ import {
   ParseUUIDPipe,
   ValidationPipe,
 } from '@nestjs/common';
-import { CreateUserDto } from './dtos/create-user.dto';
+// import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 import { UserResponseDto } from './dtos/user-response.dto';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   private users: UserEntity[] = [];
 
+  // @SetMetadata('IS_Public', true)
+  @Public()
   @Get()
   async find(): Promise<UserEntity[]> {
     // delay 5 sec
