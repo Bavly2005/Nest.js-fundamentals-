@@ -10,6 +10,8 @@ import {
   Delete,
   ParseUUIDPipe,
   ValidationPipe,
+  Logger,
+  Req,
 } from '@nestjs/common';
 // import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -17,19 +19,35 @@ import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 import { UserResponseDto } from './dtos/user-response.dto';
 import { Public } from 'src/common/decorators/public.decorator';
+import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
+
+interface EnvironmentVariables {
+  PORT: number;
+  EMAIL: string;
+}
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  logger: Logger = new Logger(UserController.name);
+
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService<EnvironmentVariables>,
+  ) {}
   private users: UserEntity[] = [];
 
   // @SetMetadata('IS_Public', true)
   @Public()
   @Get()
-  async find(): Promise<UserEntity[]> {
-    // delay 5 sec
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return this.userService.findUsers();
+  async find(@Req() req: Request): Promise<UserEntity[]> {
+    this.logger.log('Getting all users');
+
+    const users = await this.userService.findUsers();
+
+    this.logger.debug(`Found ${users.length} users`);
+
+    return users;
   }
 
   @Get(':id')
